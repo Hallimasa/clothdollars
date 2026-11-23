@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+version = '0.1.1'
+group = 'dev.clothdollars'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge {
+    version = '21.1.265'
+    runs {
+        client { client() }
+        server { server(); programArgument '--nogui' }
+    }
+    mods { clothdollars { sourceSet sourceSets.main } }
+}
+repositories { maven { url = 'https://api.modrinth.com/maven' } }
+// Use the publisher's immutable NeoForge file IDs. A local modpack can supply identical jars.
+configurations { createRelease }
+def modDir = providers.gradleProperty('modDir')
+def release = { name, id, file ->
+    modDir.present ? files(new File(modDir.get(), file)) : "maven.modrinth:${name}:${id}"
+}
+def createJar = release('create','UjX6dr61','create-1.21.1-6.0.10.jar')
+def extracted = layout.buildDirectory.dir('create-libraries')
+def unpackCreate = tasks.register('unpackCreate', Sync) {
+    from { zipTree(configurations.createRelease.singleFile) }
+    include 'META-INF/jarjar/*.jar'
+    into extracted
+}
+dependencies {
+    createRelease createJar
+    compileOnly release('jade','eYz2YBGT','Jade-1.21.1-NeoForge-15.10.6.jar')
+    implementation createJar
+    compileOnly files(unpackCreate.map { fileTree(extracted).matching { include '**/*.jar' } })
+    implementation release('cobbledollars','Iqiqjfsi','CobbleDollars-neoforge-2.0.0+Beta-6.1+1.21.1.jar')
+    runtimeOnly release('cobblemon','xsVHrAsY','Cobblemon-neoforge-1.8.4+1.21.1.jar')
+    runtimeOnly release('kotlin-for-forge','uhJhCT7X','kotlinforforge-5.12.0-all.jar')
+}
+tasks.compileJava.dependsOn unpackCreate
+if (providers.gradleProperty('shopTests').isPresent()) {
+    sourceSets {
+        shopTest {
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.runtimeClasspath
+        }
+    }
+    neoForge.mods.clothdollars.sourceSet(sourceSets.shopTest)
+    neoForge.runs {
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'clothdollars'
+            gameDirectory = file('build/shop-test-world')
+        }
+    }
+}

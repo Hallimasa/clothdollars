@@ -1,0 +1,34 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="clothdollars"
+version="0.1.1"
+displayName="Create × CobbleDollars"
+description="Price Create Table Cloth offers in CobbleDollars."
+[[mixins]]
+config="clothdollars.mixins.json"
+[[dependencies.clothdollars]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.clothdollars]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.265]"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.clothdollars]]
+modId="create"
+type="required"
+versionRange="[6.0.10]"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.clothdollars]]
+modId="cobbledollars"
+type="required"
+versionRange="[2.0.0+Beta-6.1+1.21.1]"
+ordering="AFTER"
+side="BOTH"
