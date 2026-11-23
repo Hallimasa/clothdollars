@@ -1,12 +1,16 @@
 package dev.clothdollars.mixin;
 
+import java.math.BigInteger;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import fr.harmex.cobbledollars.common.utils.extensions.BigIntegerExtensionsKt;
 import com.simibubi.create.content.logistics.tableCloth.TableClothBlockEntity;
 import com.simibubi.create.content.logistics.tableCloth.TableClothRenderer;
 import dev.clothdollars.Prices;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.LightTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,22 +21,19 @@ abstract class TagRenderer {
     private void price(TableClothBlockEntity cloth,float partial,PoseStack pose,MultiBufferSource buffers,int light,int overlay,CallbackInfo ci) {
         String value = Prices.price(cloth);
         if (value.isEmpty()) return;
-        String label = "$" + value;
-        if (value.length()>5) {
-            String[] units = {"","k","m","b","t"};
-            int group = (value.length()-1)/3;
-            label = group < units.length ? "$"+value.substring(0,value.length()-group*3)+units[group] : "$"+value.charAt(0)+"e"+(value.length()-1);
-        }
-        var transform = cloth.priceTag.getSlotPositioning();
-        var offset = transform.getLocalOffset(cloth.getLevel(),cloth.getBlockPos(),cloth.getBlockState());
-        pose.pushPose();
-        pose.translate(offset.x,offset.y,offset.z);
-        transform.rotate(cloth.getLevel(),cloth.getBlockPos(),cloth.getBlockState(),pose);
-        pose.translate(0, 0, -0.025);
+        var label = BigIntegerExtensionsKt.format(new BigInteger(value), true).getVisualOrderText();
         Font font = Minecraft.getInstance().font;
-        float scale = Math.min(0.021f, 0.215f/font.width(label));
-        pose.scale(-scale,-scale,scale);
-        font.drawInBatch(label,-font.width(label)/2f,-4,0xffffe6a3,true,pose.last().pose(),buffers,Font.DisplayMode.NORMAL,0,net.minecraft.client.renderer.LightTexture.FULL_BRIGHT);
+        int width = font.width(label);
+        float scale = Math.min(0.03f, 0.72f / (width + 2));
+
+        // Keep the text upright in both positions. Place the front label past the tag model.
+        pose.pushPose();
+        pose.translate(0.5, cloth.sideOccluded ? 0.18 : -0.17, 0.5);
+        pose.mulPose(Axis.YP.rotationDegrees(180 - cloth.facing.toYRot()));
+        pose.translate(0, 0, cloth.sideOccluded ? -0.39 : -0.60);
+        pose.scale(-scale, -scale, scale);
+        font.drawInBatch8xOutline(label, -width / 2f, -4, 0xffffffff, 0xff000000,
+            pose.last().pose(), buffers, LightTexture.FULL_BRIGHT);
         pose.popPose();
     }
 }

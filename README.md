@@ -1,6 +1,6 @@
 # Create × CobbleDollars
 
-Install `clothdollars-0.1.1.jar` in the client and server mods folders alongside Minecraft 1.21.1, NeoForge 21.1.265, Create 6.0.10, and CobbleDollars 2.0.0+Beta-6.1+1.21.1 with their required dependencies.
+Install `clothdollars-0.1.3.jar` in the client and server mods folders alongside Minecraft 1.21.1, NeoForge 21.1.265, Create 6.0.10, and CobbleDollars 2.0.0+Beta-6.1+1.21.1 with their required dependencies.
 
 As the seller, right-click your configured Table Cloth's price tag with an empty main hand. Choose **Use CobbleDollars**, enter a whole-number amount or adjust it with the buttons, and confirm. Clicking with a currency item selects Create's normal item payment.
 

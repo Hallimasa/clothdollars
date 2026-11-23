@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="All Rights Reserved"
 [[mods]]
 modId="clothdollars"
-version="0.1.1"
+version="0.1.3"
 displayName="Create × CobbleDollars"
 description="Price Create Table Cloth offers in CobbleDollars."
 [[mixins]]
